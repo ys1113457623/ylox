@@ -7,10 +7,11 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Scanner;
+import ylox.scanner.Token;
 
 public class YLox{
     static boolean hadError = false;
-    public static void main(String[] args) throws IOException{ 
+    public static void main(String[] args) throws IOException {
         if (args.length > 1){
             System.out.println("Usage: ylox [script]");
             System.exit(64);
@@ -19,19 +20,18 @@ public class YLox{
         } else {
             runPrompt();
         }
-    
     }
 
     private static void run(String source) {
         Scanner scanner = new Scanner(source);
-        List<Token> tokens = scanner.scanTokens();
+        List<Token> tokens = scanner.tokens();
 
         for(Token token : tokens){
             System.out.println(token);
         }
     }
 
-    static void error(int line, String message){
+    public static void error(int line, String message){
         report(line, "", message);
     }
 
@@ -48,6 +48,7 @@ public class YLox{
             String line = reader.readLine();
             if (line == null) break;
             run(line);
+            hadError = false;
         }
     }
     
@@ -55,5 +56,7 @@ public class YLox{
     private static void runFile(String string) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(string));
         run(new String(bytes,Charset.defaultCharset()));
+
+        if(hadError) System.exit(65);
     }
 }
